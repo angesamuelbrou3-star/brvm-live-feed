@@ -1,0 +1,26 @@
+{
+  "source": "manual seed",
+  "isSeed": true,
+  "currency": "XOF",
+  "updatedAt": "2026-11-12T00:00:00Z",
+  "referenceDate": "2026-11-12",
+  "count": 7,
+  "quotes": {
+    "SNTS": 25000,
+    "SIBC": 5850,
+    "BOAB": 6200,
+    "TTLS": 2450,
+    "CABC": 11500,
+    "ONTBF": 1500,
+    "UNLC": 4200
+  },
+  "dailyChangePct": {
+    "SNTS": 0,
+    "SIBC": 0,
+    "BOAB": 0,
+    "TTLS": 0,
+    "CABC": 0,
+    "ONTBF": 0,
+    "UNLC": 0
+  }
+}
