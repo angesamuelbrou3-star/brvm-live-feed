@@ -17,7 +17,7 @@ jobs:
   update:
     name: Fetch, validate and publish quotes
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,7 +34,8 @@ jobs:
 
       - name: Install R packages
         run: |
-          Rscript -e 'install.packages(c("BRVM", "jsonlite", "dplyr"), repos="https://cloud.r-project.org")'
+          Rscript -e 'install.packages(c("jsonlite", "dplyr", "remotes"), repos="https://cloud.r-project.org")'
+          Rscript -e 'remotes::install_github("Koffi-Fredysessie/BRVM", dependencies=TRUE)'
 
       - name: Fetch quotes
         run: Rscript scripts/fetch_brvm.R
