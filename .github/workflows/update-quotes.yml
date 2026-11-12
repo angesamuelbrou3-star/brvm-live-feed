@@ -1,6 +1,11 @@
 name: BRVM Live Feed - Update quotes
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-quotes.yml'
+      - 'scripts/fetch_brvm.R'
   schedule:
     - cron: "30 16 * * 1-5"
   workflow_dispatch:
