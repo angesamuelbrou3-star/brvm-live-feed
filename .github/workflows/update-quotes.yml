@@ -1,4 +1,4 @@
-name: Update BRVM quotes
+name: BRVM Live Feed - Update quotes
 
 on:
   schedule:
@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   update:
+    name: Fetch, validate and publish quotes
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
