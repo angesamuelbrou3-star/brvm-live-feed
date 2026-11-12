@@ -1,0 +1,65 @@
+name: Update BRVM quotes
+
+on:
+  schedule:
+    - cron: "30 16 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.4.2"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Install R packages
+        run: |
+          Rscript -e 'install.packages(c("BRVM", "jsonlite", "dplyr"), repos="https://cloud.r-project.org")'
+
+      - name: Fetch quotes
+        run: Rscript scripts/fetch_brvm.R
+
+      - name: Validate JSON feed
+        run: |
+          python3 - <<'PY'
+          import json
+          from datetime import datetime
+
+          with open("quotes.json", encoding="utf-8") as f:
+              data = json.load(f)
+
+          assert data.get("isSeed") is False, "Seed data cannot be published"
+          assert isinstance(data.get("quotes"), dict), "quotes must be an object"
+          assert len(data["quotes"]) >= 30, "Not enough tickers"
+          assert all(isinstance(v, (int, float)) and v > 0 for v in data["quotes"].values()), "Invalid prices"
+          updated = data.get("updatedAt", "")
+          assert updated.endswith("Z"), "updatedAt must be UTC"
+          datetime.fromisoformat(updated.replace("Z", "+00:00"))
+          print(f"Validation OK: {len(data['quotes'])} tickers; updatedAt={updated}")
+          PY
+
+      - name: Commit and push updated feed
+        run: |
+          if git diff --quiet -- quotes.json; then
+            echo "No quote changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add quotes.json
+          git commit -m "chore: update BRVM quotes [skip ci]"
+          git push
